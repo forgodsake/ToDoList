@@ -269,7 +269,12 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-            return null;
+
+            if(convertView==null){
+                convertView = getLayoutInflater().inflate(R.layout.child_item,null);
+            }
+
+            return convertView;
         }
 
         @Override
