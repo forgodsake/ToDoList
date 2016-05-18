@@ -1,9 +1,11 @@
-package com.google.gh.todolist;
+package com.google.gh.todolist.provider;
 
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.widget.RemoteViews;
+
+import com.google.gh.todolist.R;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

@@ -62,6 +62,11 @@ public class MainActivity extends AppCompatActivity {
     /**联系人头像**/
     private ArrayList<Bitmap> mContactsPhonto = new ArrayList<Bitmap>();
 
+    /**联系人短信**/
+    public static ArrayList<String> mContactSms = new ArrayList<String>();
+
+    private String number = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
                         Intent.ShortcutIconResource.fromContext(MainActivity.this,
                                 R.mipmap.ic_launcher));
                 sendBroadcast(shortcutIntent);
-                Toast.makeText(MainActivity.this,"add",Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this,"桌面图标已创建",Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -103,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
         ContentResolver resolver = mContext.getContentResolver();
 
         // 获取手机联系人
-        Cursor phoneCursor = resolver.query(Phone.CONTENT_URI,PHONES_PROJECTION, null, null, null);
+        Cursor phoneCursor = resolver.query(Phone.CONTENT_URI,PHONES_PROJECTION, null, null, Phone.NUMBER + " asc");
 
 
         if (phoneCursor != null) {
@@ -268,11 +273,32 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+        public View getChildView(final int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
 
             if(convertView==null){
                 convertView = getLayoutInflater().inflate(R.layout.child_item,null);
             }
+
+            convertView.findViewById(R.id.text_call).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(Intent.ACTION_CALL);
+                    intent.setData(Uri.parse("tel:"+mContactsNumber.get(groupPosition)));
+                    startActivity(intent);
+                }
+            });
+
+            convertView.findViewById(R.id.text_message).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(!number.equals(mContactsNumber.get(groupPosition))){
+                        mContactSms.clear();
+                        getSmsFromPhone(mContactsNumber.get(groupPosition));
+                    }
+                    number = mContactsNumber.get(groupPosition);
+                    startActivity(new Intent(MainActivity.this,SmsActivity.class));
+                }
+            });
 
             return convertView;
         }
@@ -316,6 +342,39 @@ public class MainActivity extends AppCompatActivity {
             ImageView contact_icon;
             TextView contact_number;
             TextView contact_name;
+        }
+    }
+
+    private Uri SMS_INBOX = Uri.parse("content://sms/");
+
+    public void getSmsFromPhone(String num) {
+        ContentResolver cr = getContentResolver();
+        String[] projection = new String[] { "body" };//"_id", "address", "person",, "date", "type"
+        String where = " address = "+ num;
+      //          "AND date >  " + (System.currentTimeMillis() - 10 * 60 * 1000);
+        Cursor cur = null;
+        try{
+            cur = cr.query(SMS_INBOX, projection, where, null, "date desc");
+            if (null == cur)
+                return;
+            while (cur.moveToNext()) {
+//            String number = cur.getString(cur.getColumnIndex("address"));//手机号
+//            String name = cur.getString(cur.getColumnIndex("person"));//联系人姓名列表
+                String body = cur.getString(cur.getColumnIndex("body"));
+                mContactSms.add(body);
+                //这里我是要获取自己短信服务号码中的验证码~~
+//            Pattern pattern = Pattern.compile(" [a-zA-Z0-9]{10}");
+//            Matcher matcher = pattern.matcher(body);
+//            if (matcher.find()) {
+//                String res = matcher.group().substring(1, 11);
+//            }
+            }
+        }catch (Exception e){
+            Toast.makeText(MainActivity.this,"获取失败",Toast.LENGTH_SHORT).show();
+        }finally {
+            if (null!=cur){
+                cur.close();
+            }
         }
     }
 
