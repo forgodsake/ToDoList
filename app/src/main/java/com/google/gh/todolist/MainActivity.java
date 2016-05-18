@@ -71,9 +71,9 @@ public class MainActivity extends AppCompatActivity {
         mContext = this;
 
         listView= (ExpandableListView) findViewById(R.id.expand_list);
-        adapter  = new CustExpandableListAdapter();
         /**得到手机通讯录联系人信息**/
         getPhoneContacts();
+        adapter  = new CustExpandableListAdapter();
         listView.setAdapter(adapter);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**得到手机通讯录联系人信息**/
     private void getPhoneContacts() {
-        ContentResolver resolver = this.getContentResolver();
+        ContentResolver resolver = mContext.getContentResolver();
 
         // 获取手机联系人
         Cursor phoneCursor = resolver.query(Phone.CONTENT_URI,PHONES_PROJECTION, null, null, null);
