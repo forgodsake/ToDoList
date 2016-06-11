@@ -27,10 +27,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 
-public class MainActivity extends AppCompatActivity {
+public class  MainActivity extends AppCompatActivity {
 
     private ExpandableListView listView;
     private CustExpandableListAdapter adapter;
@@ -69,11 +70,32 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         mContext = this;
+
+        try{
+            Class<?> activityManagerNativeClass = Class.forName("android.app.ActivityManagerNative");
+
+// 获取 gDefault 这个字段, 想办法替换它
+            Field gDefaultField = activityManagerNativeClass.getDeclaredField("gDefault");
+            gDefaultField.setAccessible(true);
+            Object gDefault = gDefaultField.get(null);
+
+// 4.x以上的gDefault是一个 android.util.Singleton对象; 我们取出这个单例里面的字段
+            Class<?> singleton = Class.forName("android.util.Singleton");
+            Field mInstanceField = singleton.getDeclaredField("mInstance");
+            mInstanceField.setAccessible(true);
+
+// ActivityManagerNative 的gDefault对象里面原始的 IActivityManager对象
+            Object rawIActivityManager = mInstanceField.get(gDefault);
+            Toast.makeText(this,gDefaultField.toString()+"\n"+gDefault.toString()+"\n"+rawIActivityManager.toString(),Toast.LENGTH_LONG).show();
+        }catch (Exception e){
+
+        }
 
         listView= (ExpandableListView) findViewById(R.id.expand_list);
         /**得到手机通讯录联系人信息**/

@@ -20,6 +20,9 @@ public class SmsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sms);
         ListView listView = (ListView) findViewById(R.id.list_sms);
         listView.setAdapter(new SmsAdapter());
+
+
+
     }
 
 
