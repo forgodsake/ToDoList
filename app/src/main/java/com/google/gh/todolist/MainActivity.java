@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -27,7 +28,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 
@@ -35,6 +35,7 @@ public class  MainActivity extends AppCompatActivity {
 
     private ExpandableListView listView;
     private CustExpandableListAdapter adapter;
+//    private TabLayout mTabLayout;
     Context mContext = null;
 
     /**获取库Phon表字段**/
@@ -73,29 +74,43 @@ public class  MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         mContext = this;
 
-        try{
-            Class<?> activityManagerNativeClass = Class.forName("android.app.ActivityManagerNative");
+        final ActionBar ab = getSupportActionBar();
+        ab.setDisplayHomeAsUpEnabled(true);
 
-// 获取 gDefault 这个字段, 想办法替换它
-            Field gDefaultField = activityManagerNativeClass.getDeclaredField("gDefault");
-            gDefaultField.setAccessible(true);
-            Object gDefault = gDefaultField.get(null);
 
-// 4.x以上的gDefault是一个 android.util.Singleton对象; 我们取出这个单例里面的字段
-            Class<?> singleton = Class.forName("android.util.Singleton");
-            Field mInstanceField = singleton.getDeclaredField("mInstance");
-            mInstanceField.setAccessible(true);
+//        mTabLayout = (TabLayout) findViewById(R.id.tabs);
+//        List<String> titles = new ArrayList<>();
+//        titles.add("Page One");
+//        titles.add("Page Two");
+//        titles.add("Page Three");
+//        mTabLayout.addTab(mTabLayout.newTab().setText(titles.get(0)));
+//        mTabLayout.addTab(mTabLayout.newTab().setText(titles.get(1)));
+//        mTabLayout.addTab(mTabLayout.newTab().setText(titles.get(2)));
 
-// ActivityManagerNative 的gDefault对象里面原始的 IActivityManager对象
-            Object rawIActivityManager = mInstanceField.get(gDefault);
-            Toast.makeText(this,gDefaultField.toString()+"\n"+gDefault.toString()+"\n"+rawIActivityManager.toString(),Toast.LENGTH_LONG).show();
-        }catch (Exception e){
-
-        }
+//        try{
+//            Class<?> activityManagerNativeClass = Class.forName("android.app.ActivityManagerNative");
+//
+//            // 获取 gDefault 这个字段, 想办法替换它
+//            Field gDefaultField = activityManagerNativeClass.getDeclaredField("gDefault");
+//            gDefaultField.setAccessible(true);
+//            Object gDefault = gDefaultField.get(null);
+//
+//            // 4.x以上的gDefault是一个 android.util.Singleton对象; 我们取出这个单例里面的字段
+//            Class<?> singleton = Class.forName("android.util.Singleton");
+//            Field mInstanceField = singleton.getDeclaredField("mInstance");
+//            mInstanceField.setAccessible(true);
+//
+//            // ActivityManagerNative 的gDefault对象里面原始的 IActivityManager对象
+//            Object rawIActivityManager = mInstanceField.get(gDefault);
+////            Toast.makeText(this,gDefaultField.toString()+"\n"+gDefault.toString()+"\n"+rawIActivityManager.toString(),Toast.LENGTH_LONG).show();
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }
 
         listView= (ExpandableListView) findViewById(R.id.expand_list);
         /**得到手机通讯录联系人信息**/
@@ -219,6 +234,11 @@ public class  MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            return true;
+        }
+
+        if (id == android.R.id.home){
+            Toast.makeText(this,"点什么点",Toast.LENGTH_SHORT).show();
             return true;
         }
 
